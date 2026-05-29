@@ -7,16 +7,20 @@ import {animate, stagger, utils} from "animejs";
   template: `
     <div class="bg-amber-50 h-full flex justify-center items-center">
       <div class="">
-        <h1 class="mb-6 xl:mb-8 text-2xl xl:text-4xl game-name text-red-700 font-bold">{{ title() }}</h1>
-        <button class="ring-2 px-6 py-3 xl:px-14 xl:py-6 xl:text-2xl text-xl focus:bg-red-700 cursor-pointer duration-300 hover:bg-red-600
+        <div class="flex flex-col justify-center items-center">
+          <h1 class="mb-6 xl:mb-8 text-2xl xl:text-4xl game-name text-red-700 font-bold">{{ title() }}</h1>
+          <button class="ring-2 px-6 py-3 xl:px-14 xl:py-6 xl:text-2xl text-xl focus:bg-red-700 cursor-pointer duration-300 hover:bg-red-600
          ring-red-500 text-white bg-red-400 rounded-2xl xl:rounded-4xl"
-        (click)="generateNumber()">
-        Play Game
-        </button>
+                  (click)="generateNumber()">
+            Play Game
+          </button>
+        </div>
+
         @if(gameStarted()){
           <div class="">
             <div class="xl:h-[90px] h-[60px]  mt-10 relative overflow-hidden">
-              <div (animate.enter)="animateQuestion($event)" class="relative text-2xl font-bold my-4 px-4 xl:text-4xl py-4 rounded-xl bg-pink-600 text-white top-0">
+              <div (animate.enter)="animateQuestion($event)" class="relative lg:text-2xl font-bold
+              my-4 px-4 xl:text-4xl text-lg xl:py-4 py-2 rounded-xl bg-orange-600 text-white top-0">
                 <p class="question-text">{{ question() }}</p>
               </div>
             </div>
@@ -27,13 +31,13 @@ import {animate, stagger, utils} from "animejs";
                   <div (click)="boxSelected()? null : chooseGeneratedNumber($index)" class="cursor-pointer duration-300 hover:scale-105 hover:xl:scale-125
                   flex justify-center items-center text-white question-box
                   size-[120px] xl:size-[190px] rounded-xl shadow-2xl
-                   bg-linear-to-r from-blue-700 to-blue-400" [class]="selectedBoxIndex() === $index && showGeneratedNumbers() ? selectedBoxStyle() : ''">
+                   bg-linear-to-r from-blue-700 to-blue-400" [class]="selectedBoxIndex() === $index && showGeneratedNumbers() ? selectedBoxStyle() : 'not-selected'">
 
                     @if(showGeneratedNumbers() && selectedBoxIndex() === $index ){
                       <span class="text-shadow-md xl:text-6xl">{{num}}</span>
                     }
                     @else{
-                      ?
+                      <span class="text-5xl text-shadow">?</span>
                     }
 
                   </div>
@@ -69,7 +73,10 @@ export class App implements OnInit {
   protected boxSelected = computed(() => {
     return this.selectedBoxIndex() > -1;
   });
-  protected selectedBoxStyle = signal("bg-linear-to-r from-orange-700 to-orange-400");
+  protected playAgain = computed(() => {
+    return this.boxSelected;
+  })
+  protected selectedBoxStyle = signal("bg-linear-to-r from-orange-700 to-orange-400 user-selected-box");
   protected gameStarted = signal(false);
   protected showGeneratedNumbers = signal(false);
   protected question = computed(() => {
@@ -117,6 +124,12 @@ export class App implements OnInit {
   chooseGeneratedNumber(boxIndex: number) {
     this.showGeneratedNumbers.set(true);
     this.selectedBoxIndex.set(boxIndex);
+    if(this.boxSelected()){
+      // animated selected box
+      this.animateUserSelectedOption();
+      // then animate the unselected boxes then reveal the options
+    }
+
   }
 
   protected animateQuestion(evt: AnimationCallbackEvent) {
@@ -138,7 +151,23 @@ export class App implements OnInit {
         duration : stagger(500),
       },
       ease :"inElastic"
-    })
+    });
+  }
+
+  protected animateUserSelectedOption() {
+
+
+    const animation  = animate("div.user-selected-box", {
+      rotateY: {
+        from : "270deg"
+      },
+      scale: [{from : 1.4},{from : 0.6, to : 1.2}, { from : 1.3}],
+      ease : "outElastic",
+      duration : 700,
+      delay:100
+    });
+
+    console.log("Animation on Box selected", animation,document.querySelector(".user-selected-box"));
   }
 }
 
