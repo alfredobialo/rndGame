@@ -1,11 +1,11 @@
-import {Component, computed, OnInit, signal} from '@angular/core';
-import {animate} from "animejs";
+import {AnimationCallbackEvent, Component, computed, OnInit, signal} from '@angular/core';
+import {animate, stagger, utils} from "animejs";
 
 @Component({
   selector: 'app-root',
   imports: [],
   template: `
-    <div class="bg-amber-100 h-full flex justify-center items-center">
+    <div class="bg-amber-50 h-full flex justify-center items-center">
       <div class="">
         <h1 class="mb-6 xl:mb-8 text-2xl xl:text-4xl game-name text-red-700 font-bold">{{ title() }}</h1>
         <button class="ring-2 px-6 py-3 xl:px-14 xl:py-6 xl:text-2xl text-xl focus:bg-red-700 cursor-pointer duration-300 hover:bg-red-600
@@ -15,15 +15,25 @@ import {animate} from "animejs";
         </button>
         @if(gameStarted()){
           <div class="">
-            <p class="text-xl my-4">{{question()}}</p>
-            <div class="mt-10 text-5xl space-x-10">
-              <div class="flex lg:space-x-3 xl:space-x-6 space-x-2">
-                @for(num of numsArr(); track $index){
-                  <div (click)="chooseGeneratedNumber($index)" class="cursor-pointer duration-300 hover:scale-105 hover:xl:scale-125
-                  flex justify-center items-center text-white size-[120px] xl:size-[190px] rounded-xl shadow-2xl bg-linear-to-r from-blue-700 to-blue-400">
+            <div class="xl:h-[90px] h-[60px]  mt-10 relative overflow-hidden">
+              <div (animate.enter)="animateQuestion($event)" class="relative text-2xl font-bold my-4 px-4 xl:text-4xl py-4 rounded-xl bg-pink-600 text-white top-0">
+                <p class="question-text">{{ question() }}</p>
+              </div>
+            </div>
 
-                    @if(showGeneratedNumbers() && selectedBoxIndex() === $index){
-                      <span class="text-shadow-md">{{num}}</span>
+            <div class="mt-10 text-5xl space-x-10">
+              <div class="flex lg:space-x-3 xl:space-x-6 space-x-2" (animate.enter)="animateQuestionBoxes($event)">
+                @for(num of numsArr(); track $index){
+                  <div (click)="boxSelected()? null : chooseGeneratedNumber($index)" class="cursor-pointer duration-300 hover:scale-105 hover:xl:scale-125
+                  flex justify-center items-center text-white question-box
+                  size-[120px] xl:size-[190px] rounded-xl shadow-2xl
+                   bg-linear-to-r from-blue-700 to-blue-400" [class]="selectedBoxIndex() === $index && showGeneratedNumbers() ? selectedBoxStyle() : ''">
+
+                    @if(showGeneratedNumbers() && selectedBoxIndex() === $index ){
+                      <span class="text-shadow-md xl:text-6xl">{{num}}</span>
+                    }
+                    @else{
+                      ?
                     }
 
                   </div>
@@ -38,7 +48,7 @@ import {animate} from "animejs";
 
 
             </div>
-            <p class="text-xl">{{selectedBoxIndex()}}</p>
+            <p class="text-xl">{{selectedBoxIndex()}}  ,,, {{boxSelected()}}</p>
           </div>
         }
 
@@ -56,6 +66,10 @@ export class App implements OnInit {
   protected numsArr = signal<number[]>([0,0,0]);
   protected answer = signal(0);
   protected selectedBoxIndex = signal(-1);
+  protected boxSelected = computed(() => {
+    return this.selectedBoxIndex() > -1;
+  });
+  protected selectedBoxStyle = signal("bg-linear-to-r from-orange-700 to-orange-400");
   protected gameStarted = signal(false);
   protected showGeneratedNumbers = signal(false);
   protected question = computed(() => {
@@ -97,11 +111,34 @@ export class App implements OnInit {
 
   this.numsArr.set([num,num2,num3]);
   this.showGeneratedNumbers.set(false);
+  this.selectedBoxIndex.set(-1);
 
   }
   chooseGeneratedNumber(boxIndex: number) {
     this.showGeneratedNumbers.set(true);
     this.selectedBoxIndex.set(boxIndex);
+  }
+
+  protected animateQuestion(evt: AnimationCallbackEvent) {
+    animate(evt.target, {
+      y: {from: "-100px"},
+    });
+    const qTextElem = evt.target.querySelector(".question-text") as Element;
+    animate(qTextElem, {
+      y: {from: "120px", delay: 200, ease: 'inOutBack' , duration: 1400},
+    });
+  }
+
+  protected animateQuestionBoxes(evt: AnimationCallbackEvent) {
+    const boxes = evt.target.querySelectorAll(".question-box") ;
+    animate(boxes, {
+      scale : {
+        from : 0 ,
+        delay : stagger(100, {start : 300}),
+        duration : stagger(500),
+      },
+      ease :"inElastic"
+    })
   }
 }
 
