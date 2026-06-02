@@ -16,27 +16,27 @@ import {animate, stagger, utils} from "animejs";
           </button>
         </div>
 
-        @if(gameStarted()){
+        @if (gameStarted()) {
           <div class="">
-            <div class="xl:h-[90px] h-[60px]  mt-10 relative overflow-hidden">
+            <div class="xl:h-[100px] h-[60px]  mt-10 relative overflow-hidden">
               <div (animate.enter)="animateQuestion($event)" class="relative lg:text-2xl font-bold
-              my-4 px-4 xl:text-4xl text-lg xl:py-4 py-2 rounded-xl bg-orange-600 text-white top-0">
+              my-1 px-4 xl:text-4xl text-lg xl:py-2 py-2 rounded-xl bg-orange-600 text-white top-0">
                 <p class="question-text">{{ question() }}</p>
               </div>
             </div>
 
             <div class="mt-10 text-5xl space-x-10">
-              <div class="flex lg:space-x-3 xl:space-x-6 space-x-2" (animate.enter)="animateQuestionBoxes($event)">
-                @for(num of numsArr(); track $index){
-                  <div (click)="boxSelected()? null : chooseGeneratedNumber($index)" class="cursor-pointer duration-300 hover:scale-105 hover:xl:scale-125
+              <div class="flex justify-evenly" (animate.enter)="animateQuestionBoxes($event)">
+                @for (num of numsArr(); track $index) {
+                  <div (click)="boxSelected()? null : userSelectedAnswer($index)" class="cursor-pointer duration-300 hover:scale-105 hover:xl:scale-125
                   flex justify-center items-center text-white question-box
                   size-[120px] xl:size-[190px] rounded-xl shadow-2xl
-                   bg-linear-to-r from-blue-700 to-blue-400" [class]="selectedBoxIndex() === $index && showGeneratedNumbers() ? selectedBoxStyle() : 'not-selected'">
+                   bg-linear-to-r from-blue-700 to-blue-400 my-box"
+                       [class]="selectedBoxIndex() === $index && showGeneratedNumbers() ? selectedBoxStyle() : 'not-selected'">
 
-                    @if(showGeneratedNumbers() && selectedBoxIndex() === $index ){
-                      <span class="text-shadow-md xl:text-6xl">{{num}}</span>
-                    }
-                    @else{
+                    @if (showGeneratedNumbers() && selectedBoxIndex() === $index || showAllOptions()) {
+                      <span class="text-shadow-md xl:text-6xl">{{ num }}</span>
+                    } @else {
                       <span class="text-5xl text-shadow">?</span>
                     }
 
@@ -46,13 +46,14 @@ import {animate, stagger, utils} from "animejs";
 
               </div>
 
-              @if(showAnswer()){
-                <div class="mt-4">Answer :  {{ answer() }} </div>
+              @if (showAnswer()) {
+                <div class="mt-4">Answer :  {{ answer() }}</div>
               }
 
 
             </div>
-            <p class="text-xl">{{selectedBoxIndex()}}  ,,, {{boxSelected()}}</p>
+            <p class="text-xl">Selected Box Index = {{ selectedBoxIndex() }}  , ShowAllOptions = {{ showAllOptions() }}, Box selected
+              => {{ boxSelected() }}</p>
           </div>
         }
 
@@ -67,7 +68,7 @@ import {animate, stagger, utils} from "animejs";
 })
 export class App implements OnInit {
   protected readonly title = signal('Number Guess Game');
-  protected numsArr = signal<number[]>([0,0,0]);
+  protected numsArr = signal<number[]>([0, 0, 0]);
   protected answer = signal(0);
   protected selectedBoxIndex = signal(-1);
   protected boxSelected = computed(() => {
@@ -83,7 +84,7 @@ export class App implements OnInit {
     return `Choose where ${this.answer()} is in the boxes`;
   });
   showAnswer = signal(false);
-
+  showAllOptions = signal(false);
 
   constructor() {
 
@@ -101,30 +102,32 @@ export class App implements OnInit {
   }
 
   protected generateNumber() {
-      this.gameStarted.set(true);
+    this.gameStarted.set(true);
 
-      const num  = getRandomInt(1,10);
-      const num2  = getRandomInt(1,10);
-      const num3  = getRandomInt(1,10);
+    const num = getRandomInt(1, 10);
+    const num2 = getRandomInt(1, 10);
+    const num3 = getRandomInt(1, 10);
 
-      const ans = getRandomInt(1,3);
-      if(ans === 1)
-        this.answer.set(num);
-      else if (ans === 2)
-        this.answer.set(num2);
-      else if (ans === 3)
-        this.answer.set(num3);
+    const ans = getRandomInt(1, 3);
+    if (ans === 1)
+      this.answer.set(num);
+    else if (ans === 2)
+      this.answer.set(num2);
+    else if (ans === 3)
+      this.answer.set(num3);
 
 
-  this.numsArr.set([num,num2,num3]);
-  this.showGeneratedNumbers.set(false);
-  this.selectedBoxIndex.set(-1);
-
+    this.numsArr.set([num, num2, num3]);
+    this.showGeneratedNumbers.set(false);
+    this.selectedBoxIndex.set(-1);
+    this.showAllOptions.set(false);
   }
-  chooseGeneratedNumber(boxIndex: number) {
+
+  userSelectedAnswer(boxIndex: number) {
     this.showGeneratedNumbers.set(true);
     this.selectedBoxIndex.set(boxIndex);
-    if(this.boxSelected()){
+    if (this.boxSelected()) {
+      this.showAllOptions.set(true);
       // animated selected box
       this.animateUserSelectedOption();
       // then animate the unselected boxes then reveal the options
@@ -138,36 +141,34 @@ export class App implements OnInit {
     });
     const qTextElem = evt.target.querySelector(".question-text") as Element;
     animate(qTextElem, {
-      y: {from: "120px", delay: 200, ease: 'inOutBack' , duration: 1400},
+      y: {from: "120px", delay: 200, ease: 'inOutBack', duration: 1400},
     });
   }
 
   protected animateQuestionBoxes(evt: AnimationCallbackEvent) {
-    const boxes = evt.target.querySelectorAll(".question-box") ;
+    const boxes = evt.target.querySelectorAll(".question-box");
     animate(boxes, {
-      scale : {
-        from : 0 ,
-        delay : stagger(100, {start : 300}),
-        duration : stagger(500),
+      scale: {
+        from: 0,
+        delay: stagger(100, {start: 300}),
+        duration: stagger(500),
       },
-      ease :"inElastic"
+      ease: "inElastic"
     });
   }
 
   protected animateUserSelectedOption() {
 
 
-    const animation  = animate("div.user-selected-box", {
-      rotateY: {
-        from : "270deg"
-      },
-      scale: [{from : 1.4},{from : 0.6, to : 1.2}, { from : 1.3}],
-      ease : "outElastic",
-      duration : 700,
-      delay:100
+    const animation = animate("div.my-box", {
+      rotate: "-=1turn",
+      scale: [{from: 1.4 , duration: 700}],
+      ease: "linear",
+      duration: 700,
+      delay: 100
     });
 
-    console.log("Animation on Box selected", animation,document.querySelector(".user-selected-box"));
+    console.log("Animation on Box selected", animation, document.querySelector(".user-selected-box"));
   }
 }
 
