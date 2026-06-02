@@ -160,7 +160,7 @@ export class App implements OnInit {
   protected animateUserSelectedOption() {
 
 
-    const animation = animate("div.my-box", {
+    const animation = animate(".user-selected-box", {
       rotate: "-=1turn",
       scale: [{from: 1.4 , duration: 700}],
       ease: "linear",
