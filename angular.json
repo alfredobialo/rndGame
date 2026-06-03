@@ -8,7 +8,16 @@
   "projects": {
     "rndGame": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "inlineTemplate": true,
+          "flat": true,
+          "inlineStyle": true,
+          "prefix": "gm",
+          "skipTests": true,
+          "path": "src"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
