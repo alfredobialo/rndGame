@@ -95,12 +95,21 @@ export class GamePage {
 
   protected generateNumber() {
     this.gameStarted.set(true);
+    const lowerBound = 1 , upperBound = 10;
+    let num = getRandomInt(lowerBound, upperBound);
+    let num2 = getRandomInt(lowerBound, upperBound);
+    let num3 = getRandomInt(lowerBound, upperBound);
+    console.log("num generated, checking for duplicates")
+    // ensure all numbers are different
+    while (num === num2 || num === num3 || num2 === num3 ) {
+       console.log("Similar Number generated", num, num2, num3);
+      num = getRandomInt(lowerBound, upperBound);
+      num2 = getRandomInt(lowerBound, upperBound);
+      num3 = getRandomInt(lowerBound, upperBound);
+      console.log("Newly generated Numbers are:", num, num2, num3);
+    }
 
-    const num = getRandomInt(1, 10);
-    const num2 = getRandomInt(1, 10);
-    const num3 = getRandomInt(1, 10);
-
-    const ans = getRandomInt(1, 3);
+    const ans = getRandomInt(1, this.numsArr().length);
     if (ans === 1)
       this.answer.set(num);
     else if (ans === 2)
@@ -166,3 +175,4 @@ export class GamePage {
 function getRandomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+//TODO prevent generation of similar rnd Number during game play
