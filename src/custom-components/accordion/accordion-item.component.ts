@@ -1,4 +1,4 @@
-import {AnimationCallbackEvent, booleanAttribute, Component, input, signal} from '@angular/core';
+import {AnimationCallbackEvent, booleanAttribute, Component, input, computed, signal, viewChild, ElementRef, effect} from '@angular/core';
 import {animate} from 'animejs';
 
 @Component({
@@ -23,18 +23,30 @@ import {animate} from 'animejs';
 })
 export class AccordionItem {
 
+  protected divElem = viewChild<ElementRef>('div');
+  heightExpanded = computed<string>(() => {
+    return this.isOpen() ? '300px' : '0px';
+  });
   isOpen = signal(true);
   title = input.required<string>();
   id = input("");
   expanded = input(true, { transform : booleanAttribute});
+
+  constructor() {
+    effect(() => {
+      console.log("Accordion Panel Open State: ",this.isOpen() ? "OPEN" : "CLOSE");
+    });
+  }
+
   protected handleCollapseState() {
+    console.log("Div Height :" , this.heightExpanded(), this.isOpen(), this.divElem()?.nativeElement);
     this.isOpen.update(x => !x);
     // raise an event to signify current state
   }
 
   protected expandPanel($event: AnimationCallbackEvent) {
     animate($event.target, {
-      height : "300px",
+      height : this.heightExpanded(),
       duration:700,
     });
   }
@@ -42,7 +54,7 @@ export class AccordionItem {
   protected collapsePanel($event: AnimationCallbackEvent) {
     animate($event.target, {
       duration:500,
-      height : "-=300px",
+      height : this.heightExpanded(),
       onComplete : () => $event.animationComplete()
     });
   }
