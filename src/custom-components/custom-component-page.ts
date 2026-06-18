@@ -14,16 +14,23 @@ import {AccordionItem} from './accordion/accordion-item.component';
           Accordion Custom Components
       </p>
       <gm-accordion>
-        <gm-accordion-item>
+        <gm-accordion-item title="Customer Management" id="crm" >
+          <div class="flex flex-col w-[200px] gap-y-1.5">
+            <a  class="inline-block rounded-md  cursor-pointer text-white bg-orange-700 px-4 py-2">Link #</a>
+            <a  class="inline-block rounded-md  cursor-pointer text-white bg-orange-700 px-4 py-2">Link #</a>
+            <a  class="inline-block rounded-md  cursor-pointer text-white bg-orange-700 px-4 py-2">Link #</a>
+            <a  class="inline-block rounded-md  cursor-pointer text-white bg-orange-700 px-4 py-2">Link #</a>
+            <a  class="inline-block rounded-md  cursor-pointer text-white bg-orange-700 px-4 py-2">Link #</a>
+          </div>
         </gm-accordion-item>
 
-        <gm-accordion-item>
+        <gm-accordion-item title="Other Menus">
         </gm-accordion-item>
 
-        <gm-accordion-item>
+        <gm-accordion-item title="Other Menus">
         </gm-accordion-item>
 
-        <gm-accordion-item>
+        <gm-accordion-item title="Other Menus">
         </gm-accordion-item>
       </gm-accordion>
     </div>
