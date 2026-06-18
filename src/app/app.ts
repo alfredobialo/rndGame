@@ -1,6 +1,6 @@
-import {Component, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
-import {AppMenuModel} from './appMenuModel';
+import { AppMenuModel, AppMenuService} from './appMenuModel';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +17,6 @@ import {AppMenuModel} from './appMenuModel';
           <a [routerLink]="m.menuRoute" routerLinkActive="text-white bg-rose-700" class="duration-300 px-4 py-2 block mb-2 bg-rose-200 ring-rose-300 ring-2 rounded-lg">
             {{ m.menuTitle }}</a>
         }
-j
       </div>
       <div class="flex-1 xl:px-8 xl:py-4">
         <router-outlet></router-outlet>
@@ -31,14 +30,7 @@ j
   styles: ``
 })
 export class App  {
-  protected menus = signal<AppMenuModel[]>(
-    [
-      {menuRoute:"quiz", menuTitle:"Quiz Page"},
-      {menuRoute : "game", menuTitle:"The Number Game"},
-      {menuRoute : "ng-features", menuTitle:"Angular Features"},
-      {menuRoute : "todos", menuTitle:"My Task (todo)"},
-      {menuRoute : "signal-form", menuTitle:"Signal Form Demo"},
-    ]);
+  protected menus = inject(AppMenuService).getAppMenus();
 }
 
 

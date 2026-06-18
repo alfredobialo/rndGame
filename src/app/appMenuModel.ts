@@ -1,4 +1,4 @@
-import {signal} from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 
 export interface AppMenuModel  {
   menuRoute:string,
@@ -8,19 +8,24 @@ export interface AppMenuModel  {
   isEnabled?:boolean,
 }
 
-export class AppMenuFactory {
+@Injectable({providedIn: 'root'})
+export class AppMenuService {
 
-  private readonly menus = signal<AppMenuModel[]>(
+  private  menus = signal<AppMenuModel[]>(
     [
       {menuRoute: "quiz", menuTitle: "Quiz Page"},
       {menuRoute: "game", menuTitle: "The Number Game"},
       {menuRoute: "ng-features", menuTitle: "Angular Features"},
       {menuRoute: "todos", menuTitle: "My Task (todo)"},
       {menuRoute: "signal-form", menuTitle: "Signal Form Demo"},
+      {menuRoute: "ui", menuTitle: "Custom Components"},
     ]);
-  getAppMenus = () => this.menus;
-  createMenu (menu : AppMenuModel){
-    this
+  getAppMenus = () => this.menus.asReadonly();
+  createMenu (menu : AppMenuModel, menuIconClass:string = "", isVisible:boolean = true, isEnabled:boolean = true) {
+    const mm:AppMenuModel = {...menu, menuIcon:menuIconClass, isVisible, isEnabled};
+    this.menus.update( x => {
+      return [...x , mm];
+    });
   }
 
 
