@@ -44,4 +44,5 @@ import {AccordionItem} from './accordion/accordion-item.component';
     `,
   styles: ``,
 })
-export class CustomComponentPage {}
+export class CustomComponentPage {
+}
