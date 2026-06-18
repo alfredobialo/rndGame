@@ -3,6 +3,7 @@ import {GamePage} from '../pages/game-page';
 import {NgFeaturePage} from '../pages/ng-feature-page';
 import {TodoPage} from '../pages/todo-page';
 import {SignalFormPage} from '../pages/signal-form-page';
+import {QuizPage} from '../pages/quiz-page';
 
 export const routes: Routes = [
   {
@@ -20,6 +21,10 @@ export const routes: Routes = [
   {
     path: 'signal-form',
     component : SignalFormPage,
+  },
+  {
+    path:'quiz',
+    component : QuizPage
   },
   {
     path: '',
